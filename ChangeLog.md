@@ -1,3 +1,3 @@
-# Changelog for hasklab
+# Changelog for kanjibenkyo
 
 ## Unreleased changes
