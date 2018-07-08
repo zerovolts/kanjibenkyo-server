@@ -4,9 +4,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
@@ -17,12 +14,11 @@ import Network.Wai.Handler.Warp
 import Control.Monad.Trans.Reader
 import GHC.Generics (Generic)
 import GHC.TypeLits
-import Data.Aeson
 import Database.Beam
 import Database.Beam.Postgres
 import Data.Proxy
-import Data.Text (Text)
-import Data.Vector
+
+import KanjiBenkyo.Tables.KanjiTable
 
 type API = SimpleAPI "kanji" (KanjiTable Identity) Int
 
@@ -76,24 +72,3 @@ myDatabase = defaultDbSettings `withDbModification`
   dbModification {
     dbKanjiTable = modifyTable (\_ -> "kanji") tableModification
   }
-
-data KanjiTable f = Kanji
-  { _kanjiId :: Columnar f Int
-  , _kanjiCharacter :: Columnar f Text
-  , _kanjiRadical :: Columnar f Text
-  , _kanjiKunyomi :: Columnar f (Vector Text)
-  , _kanjiOnyomi :: Columnar f (Vector Text)
-  , _kanjiMeaning :: Columnar f (Vector Text)
-  , _kanjiStrokes :: Columnar f Int
-  , _kanjiJlpt :: Columnar (Nullable f) Int
-  , _kanjiGrade :: Columnar (Nullable f) Int
-  } deriving stock (Generic)
-    deriving anyclass (Beamable)
-
-instance ToJSON (KanjiTable Identity) -- fill this in
-
-instance Table KanjiTable where
-  data PrimaryKey KanjiTable f = KanjiId (Columnar f Int)
-    deriving stock Generic
-    deriving anyclass Beamable
-  primaryKey :: KanjiTable column -> PrimaryKey KanjiTable column
